@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+
+<head>
+    <title>加载更多</title>
+    <style>
+        ul {
+            list-style: none;
+            margin: 0 0 0 -40px;
+        }
+
+        ul li {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        ul li:hover {
+            background: #ccc;
+        }
+
+        div {
+            text-align: center;
+        }
+
+        #btn {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            padding: 15px;
+            outline: none;
+        }
+
+        #btn:hover {
+            background: #ccc;
+        }
+    </style>
+</head>
+
+<body>
+    <ul id="conts">
+    </ul>
+    <div>
+        <button id="btn">加载更多</button>
+    </div>
+
+    <script>
+        var btn = document.querySelector("#btn");
+        var liList = document.querySelector("#conts");
+        var isLoading = true;
+        var indexNum = 0;
+        btn.addEventListener("click", function () {
+            if (!isLoading) {
+                return;
+            }
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200 || xhr.status === 304) {
+                        var results = JSON.parse(xhr.responseText);
+                        var fragment = document.createDocumentFragment();
+                        for (var i = 0; i < results.length; i++) {
+                            var node = document.createElement("li");
+                            node.innerText = results[i];
+                            fragment.appendChild(node);
+                        }
+                        liList.appendChild(fragment);
+                        indexNum += 5;
+                    } else {
+                        console.log("error");
+                    }
+                    isLoading = true;
+                }
+            }
+            xhr.open("get", "/getInfo?index=" + indexNum + "&length=5", true);
+            xhr.send();
+            isLoading = false;
+        })
+    </script>
+</body>
+
+</html>
